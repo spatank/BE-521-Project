@@ -20,6 +20,7 @@ window_length = 100/1000; % window size (s)
 window_overlap = 50/1000; % window displacement (s)
 
 for i = 1:num_subjects
+    fprintf('Subject %d processing.\n', i);
     subj_test_ecog = test_ecog{i};
     if i == 1 % channel removed from subject 1
         subj_test_ecog(:, 61) = [];
@@ -31,7 +32,6 @@ for i = 1:num_subjects
     % create R matrix
     R = getWindowedFeats(subj_test_ecog, fs, window_length, window_overlap);
     load(sprintf('/Users/sppatankar/Developer/BE-521/Project/Data/f_subj_%d.mat', i), 'f')
-    fprintf('Subject %d processing.\n', i);
     Y_hat_test = R * f; 
     num_dg_channels = size(Y_hat_test, 2); 
     % Upsample the predictions in each window
@@ -42,7 +42,7 @@ for i = 1:num_subjects
             linspace(1, length(Y_hat_test(:, channel)), size(subj_test_ecog, 1)), ...
             'pchip'); 
     end
-    predicted_dg{i} = Y_hat_test_full;
+    predicted_dg{i} = smoothdata(Y_hat_test_full, 'movmean', 250);
 end
 
 

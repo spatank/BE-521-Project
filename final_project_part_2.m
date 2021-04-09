@@ -100,10 +100,10 @@ for channel = 1:num_dg_channels
     Y_hat_train_full(:, channel) = interp1(1:length(Y_hat_train(:, channel)), ...
         Y_hat_train(:, channel), ...
         linspace(1, length(Y_hat_train(:, channel)), size(train_dg, 1)), ...
-        'spline'); 
+        'pchip'); 
 end
 train_corrs = diag(corr(Y_hat_train_full, train_dg))
-
+train_corrs = diag(corr(smoothdata(Y_hat_train_full, 'movmean', 250), train_dg))
 
 % % Alternative Model
 % alt_models = struct([]);
@@ -144,9 +144,10 @@ for channel = 1:num_dg_channels
     Y_hat_val_full(:, channel) = interp1(1:length(Y_hat_val(:, channel)), ...
         Y_hat_val(:, channel), ...
         linspace(1, length(Y_hat_val(:, channel)), size(val_dg, 1)), ...
-        'spline'); 
+        'pchip'); 
 end
 val_corrs = diag(corr(Y_hat_val_full, val_dg))
+val_corrs = diag(corr(smoothdata(Y_hat_train_full, 'movmean', 250), val_dg))
 
 % % Alternative Model
 % for channel = 1:num_dg_channels
@@ -169,19 +170,32 @@ close all;
 
 figure;
 hold on
-plot(1:150000, train_dg(1:150000), 'r')
-plot(1:150000, Y_hat_train_full(1:150000), 'b')
+plot(1:150000, train_dg(1:150000, 1), 'r')
+plot(1:150000, Y_hat_train_full(1:150000, 1), 'b')
 hold off
 legend('True', 'Prediction');
 
 figure;
 hold on
-plot(1:60000, val_dg(1:60000), 'r')
-plot(1:60000, Y_hat_val_full(1:60000), 'b')
+plot(1:60000, val_dg(1:60000, 1), 'r')
+plot(1:60000, Y_hat_val_full(1:60000, 1), 'b')
 hold off
 legend('True', 'Prediction');
 
-% test = Y_hat_val_full;
-% test(test < 1.5) =  -0.7;
-% test(test < -1.5) =  -0.7;
-% val_corrs = diag(corr(test, val_dg))
+figure;
+% test_1 = lowpass(Y_hat_train_full(:, 1), 150, fs);
+test_1 = smoothdata(Y_hat_train_full, 'movmean', 250);
+hold on
+plot(1:150000, train_dg(1:150000, 1), 'r')
+plot(1:150000, test_1(1:150000), 'b')
+hold off
+legend('True', 'Prediction');
+
+figure;
+% test_2 = lowpass(Y_hat_val_full(:, 1), 150, fs);
+test_2 = smoothdata(Y_hat_val_full, 'movmean', 250);
+hold on
+plot(1:60000, val_dg(1:60000, 1), 'r')
+plot(1:60000, test_2(1:60000, 1), 'b')
+hold off
+legend('True', 'Prediction');
