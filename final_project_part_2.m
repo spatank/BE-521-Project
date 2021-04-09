@@ -24,7 +24,7 @@ addpath(genpath(fullfile(base_path, 'Project')))
 username = 'spatank';
 passPath = 'spa_ieeglogin.bin';
 
-subj = 1; % change this depending on which subject is being processed
+subj = 3; % change this depending on which subject is being processed
 
 % % Load training ecog from each of three patients
 % train_ecog = IEEGSession(sprintf('I521_Sub%d_Training_ecog', subj), ...
@@ -103,7 +103,6 @@ for channel = 1:num_dg_channels
         'pchip'); 
 end
 train_corrs = diag(corr(Y_hat_train_full, train_dg))
-train_corrs = diag(corr(smoothdata(Y_hat_train_full, 'movmean', 250), train_dg))
 
 % % Alternative Model
 % alt_models = struct([]);
@@ -147,7 +146,6 @@ for channel = 1:num_dg_channels
         'pchip'); 
 end
 val_corrs = diag(corr(Y_hat_val_full, val_dg))
-val_corrs = diag(corr(smoothdata(Y_hat_train_full, 'movmean', 250), val_dg))
 
 % % Alternative Model
 % for channel = 1:num_dg_channels
@@ -185,6 +183,7 @@ legend('True', 'Prediction');
 figure;
 % test_1 = lowpass(Y_hat_train_full(:, 1), 150, fs);
 test_1 = smoothdata(Y_hat_train_full, 'movmean', 250);
+train_corrs = diag(corr(test_1, train_dg))
 hold on
 plot(1:150000, train_dg(1:150000, 1), 'r')
 plot(1:150000, test_1(1:150000), 'b')
@@ -194,8 +193,20 @@ legend('True', 'Prediction');
 figure;
 % test_2 = lowpass(Y_hat_val_full(:, 1), 150, fs);
 test_2 = smoothdata(Y_hat_val_full, 'movmean', 250);
+val_corrs = diag(corr(test_2, val_dg))
 hold on
 plot(1:60000, val_dg(1:60000, 1), 'r')
 plot(1:60000, test_2(1:60000, 1), 'b')
 hold off
 legend('True', 'Prediction');
+
+ks = 200:500;
+corrs_store = zeros(1, length(200:350));
+for i = 1:length(ks)
+    k = ks(i);
+    test_2 = smoothdata(Y_hat_val_full, 'movmean', k);
+    corrs_store(i) = mean(diag(corr(test_2, val_dg)));
+end
+
+figure;
+plot(ks, corrs_store)
