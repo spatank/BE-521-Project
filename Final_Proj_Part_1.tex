@@ -1,0 +1,142 @@
+
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{listings}
+\usepackage[framed]{mcode}
+\usepackage{fullpage}
+\usepackage{amsmath}
+\usepackage[utf8x]{inputenc}
+\usepackage{import}
+\usepackage{setspace}
+\usepackage{hyperref}
+\definecolor{lightgray}{gray}{0.5}
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+    
+    
+%\section*{}
+
+
+\title{BE 521: Final project part 1 \\{\normalsize Spring 2021}
+\\{\normalsize Adapted by Thomas Campbell Arnold \& Adam Rayfield}}
+\author{32 points}
+\date{Due: Wednesday, 4/2/2021 10:00 PM}
+\maketitle \textbf{Objective:} Predict finger flexion from ECoG recordings.
+
+\subsection*{Project Overview}
+This final project involves predicting finger flexion using intracranial EEG (ECoG) in three human subjects. The data and problem framing come from the 4th BCI Competition (Miller \& , 2008). For the details of the problem, experimental protocol, data, and evaluation, please see the original 4th BCI Competition documentation (included as separate document). The remainder of the current document details your deliverables for part 1 of the project.  You should submit 6 files: the five .m files specified in the "writing your code" section below, along with this document filled out and compiled as (pennid)\_part1.pdf 
+
+\subsection*{Important Deadlines}
+\begin{tabular}{ l|l|l } 
+Date & Requirement & Points \\
+\hline
+Friday, April 2, 10:00pm & final project part 1 & 32 \\
+Monday, April 5, 10:00pm & team registration & 5 \\
+Friday, April 9, 10:00pm & pass testing set checkpoint 1 & 20 \\
+Monday, April 19, 10:00pm & pass testing set checkpoint 2 & 15 \\
+Friday,    April 23, by 10:00pm & end of competition, submit algorithm (Canvas) & 15 \\
+Wednesday, April 28, 10:00pm & hand in final report & 60 \\
+Wednesday, April 28, 1:30-3pm & competition results (Final class session) \\
+\end{tabular}
+
+\vspace{5mm}
+The grading is structured so that going the extra mile is definitely rewarded. We want you to show what you’ve learned this semester, and to have some fun!
+
+
+\subsection*{Dataset}
+The dataset has been uploaded to the IEEG Portal and can be accessed as follows:
+\begin{itemize}
+    \item Subject 1
+        \begin{itemize}
+            \item \verb|I521_Sub1_Training_ecog| - Training ECoG
+            \item \verb|I521_Sub1_Training_dg| - Training Data Glove
+            \item \verb|I521_Sub1_Leaderboard_ecog| - Testing ECoG
+        \end{itemize}
+    \item Subject 2
+        \begin{itemize}
+            \item \verb|I521_Sub2_Training_ecog| - Training ECoG
+            \item \verb|I521_Sub2_Training_dg| - Training Data Glove
+            \item \verb|I521_Sub2_Leaderboard_ecog| - Testing ECoG
+        \end{itemize}
+    \item Subject 3
+        \begin{itemize}
+            \item \verb|I521_Sub3_Training_ecog| - Training ECoG
+            \item \verb|I521_Sub3_Training_dg| - Training Data Glove
+            \item \verb|I521_Sub3_Leaderboard_ecog| - Testing ECoG
+        \end{itemize}
+\end{itemize}
+
+Your task is to develop an algorithm to use the ECoG to predict finger flexion that is captured by the Data Glove.
+
+\subsection*{Writing your code}
+To get you started with the final project we have provided a series of method stubs for you to fill out. Your job for part 1 of the final project is to build a prediction pipeline that takes in the ECoG and dataglove finger angle recordings (serving as the data and labels respectively), then uses machine learning methods to generate predicted finger angles from the ECoG signals. The files you will develop in this assignment are as follows:\\
+\begin{itemize}
+    \item $final\_project\_part\_1.m$. This script should run the entire prediction pipeline. Here you will load the data, call the $getWindowedFeats$ function, as well as ultimately train and test your machine learning classifiers.
+    \item $getWindowedFeats.m$. This function will take in raw ECoG data, and use the three following helper functions to filter the data, calculate sliding-window features, and ultimately return a response matrix to use in model training and testing (see section on optimal linear decoder).
+    \item $filter\_data.m$. This function will apply a filter to the raw data and return cleaned data.
+    \item $get\_features.m$. This function will take in a window of cleaned data and return a vector of features for that window.
+    \item $create\_R\_matrix.m$. This function will take in a feature matrix and return a response matrix as an adaptation of the optimal linear decoder method (see following section). 
+\end{itemize}
+
+\subsection*{Optimal Linear Decoder}
+You will use the \emph{optimal linear decoder} method as described in Warland et al., 1997. We will recapitulate the method in this section \footnote{We have changed minor notation in a few places for clarity. Our subscripts start at 1, theirs at 0. Also, here our index $j$ refers to ECoG channels from 1 to $\nu$.}, but consult the paper for more details. Our ultimate goal is to predict the angle of each finger as it moves over time using data recorded from the ECoG channels. The position data is captured for 300 seconds, which you will split up into $M$ total time bins, and the number of ECoG channels, $\nu$, is 62, 48, and 64 for subject 1, 2, and 3 respectively. The paradigm we adapt here tries to predict finger angle at a given time window using ECoG features calculated over the preceding $N$ time windows, using the following steps: First features will be calculated across all $\nu$ ECoG channels x $M$ total time windows. Then, following the approach that Warland et al., 1997 takes, we will construct a row vector corresponding to each time bin, that contains features for all the ECoG channels over the preceding $N$ time bins (in the paper, spike counts are their features and they index neurons instead of ECoG channels). Thus, there will be a good amount of redundancy between row vectors of adjacent time bins, but that is okay.
+
+Let $r_i^j$ be the value of the feature of channel $j$ in time bin $i$. Let the response matrix $\mathbf{R}$ be defined as
+\[ \mathbf{R} = \left[\begin{array}{lllllllllllllll}1 & r_1^1 & r^1_2 & \ldots & r^1_N & r^2_1 & r_2^2 & \ldots & r^2_N & \ldots & \ldots & r^\nu_1 & r^\nu_2 & \ldots & r^\nu_N \\
+1 & r_2^1 & r^1_3 & \ldots & r^1_{N+1} & r^2_2 & r_3^2 & \ldots & r^2_{N+1} & \ldots & \ldots & r^\nu_2 & r^\nu_3 & \ldots & r^\nu_{N+1} \\
+1 & \ldots & \ldots & \ldots & \ldots & \ldots & \ldots & \ldots & \ldots & \ldots & \ldots & \ldots & \ldots & \ldots & \ldots \\
+1 & r_{M}^1 & r^1_{M+1} & \ldots & r^1_{N+M-1} & r^2_{M} & r_{M+1}^2 & \ldots & r^2_{N+M-1} & \ldots & \ldots & r^\nu_{M} & r^\nu_{M+1} & \ldots & r^\nu_{N+M-1} \\\end{array}\right]
+\]
+This is also referred to as the design or feature matrix, with each column being a predictor, or feature. The column of 1's accounts for the intercept term in linear regression/decoding. Make sure you understand what this matrix means before moving on.
+We denote the target matrix \footnote{In Warland et al., 1997, this quantity is referred to as the stimulus vector since they are talking about decoding the stimulus from neural data after it. We, on the other hand, are trying to decode finger positions using the ECoG data before it, but we can conveniently use the same method.} (e.g. the $M$ x 5 matrix of finger angles) as $\mathbf{Y}$ and the reconstruction (e.g. the predicted finger angles) as $\mathbf{\hat{Y}}$. Solving for the minimum least-squares difference between the stimulus and reconstruction, $(\mathbf{Y}-\mathbf{\hat{Y}})^T(\mathbf{Y}-\mathbf{\hat{Y}})$, we get the analytic form for the optimal filter,
+\begin{equation} \mathbf{f} = (\mathbf{R}^T\mathbf{R})^{-1}(\mathbf{R}^T\mathbf{Y}) \end{equation}
+This equation should take a familiar form. Warland et al., 1997 don't refer to it as such, but this is \emph{exactly} the same as linear regression, one of the most commonly used algorithms in practical machine learning. Not only is this algorithm remarkably powerful, but it has a beautiful analytic form for learning the ``weights'' (here, the $\mathbf{f}$ matrix), a rarity in a field where almost all optimizations involve some sort of iterative algorithm.
+After learning the filter weights $\mathbf{f}$, we can calculate the optimal predictions as
+\begin{equation} \mathbf{\hat{Y}} = \mathbf{R}\mathbf{f}
+\end{equation}
+
+\section{Getting Started (4 points)}
+The following sections will walk you through the development of the prediction pipeline. 
+
+\begin{enumerate}
+    \item  Extract dataglove and ECoG data for each subject in the associated section of \emph{final\_project\_part\_1.m}, then split the data into a testing set and training set (at least 50\% of the data should be a part of the training set). How many samples are there in the raw ECoG recording (it is the same for all subjects)? (2 points)\\
+    Answer Here
+    \item Next, complete the \emph{filter\_data} function. Test it using the raw data extracted in the prior step. What filter type(s) and cutoff frequencies did you use? (2 points)\\
+    Answer Here
+\end{enumerate}
+
+\section{Calculating Features (12 points)}
+Here you will complete the \emph{getWindowedFeats} and \emph{getFeatures} functions. 
+\begin{enumerate}
+    \item We will calculate features across sliding time windows. If we use a suggested window\_length of 100 ms with a 50 ms window\_overlap, how many feature windows, $M$, will we have if we computed features using all the data in a given subject (1 point)?\\
+    Answer Here 
+    \item Now complete the \emph{getFeatures} function. Please create 4 OR MORE different features to calculate for each channel in each time window. Features may include the average time-domain voltage, or the average frequency-domain magnitude in consecutive 15Hz frequency bands (N.B., the \emph{conv} and \emph{spectrogram} functions, respectively, may be helpful for this.) (8 points).
+    \item Now finish the \emph{getWindowedFeats} function by putting the \emph{filtered\_data} and \emph{getFeatures} functions together to return a feature vector for each time window (3 points).
+\end{enumerate}
+
+
+\section{Creating the Response Matrix (6 points)}
+In this section, you will develop code for your \emph{create\_R\_matrix} function. 
+\begin{enumerate}
+    \item For our set of 62 channels in subject 1, what would the dimensions of the R matrix be if we calculated 6 different feature types per channel, and $N=3$ time bins where the number of total time bins $M$ is the number you calculated in 2.1? (1 pt)\\
+    Answer Here 
+    
+    \item We do not have feature data to fill out the first N-1 data rows in the R matrix that will be used to predict the first N-1 finger angles. One way to work around this is to append a copy of the first N-1 rows of your feature matrix to the beginning of your feature matrix before calculating R. Make this adjustment in \emph{create\_R\_matrix.m}, then compute the response matrix R. You can test whether your function is running correctly by running \emph{create\_R\_matrix} with data from \emph{testRfunction.mat} and verifying that the quantity mean(mean(R)) is 25.4668 (5 points). 
+\end{enumerate}
+
+\section{ML Training and Testing (10 points)}
+Here we will use the optimal linear decoder framework to predict finger angles, and additionally you will use one or more classifiers of your own choosing to make the prediction. 
+\begin{enumerate}
+    \item Update \emph{final\_project\_part\_1.m} to include outputs from \emph{getWindowedFeats} and \emph{create\_R\_matrix}. Next, calculate the linear filter (i.e. the weights matrix) $\mathbf{f}$ as defined by Equation 1 for all 5 finger angles using features calculated from your training data. You will have to first down-sample the finger flexion data so that your feature matrix, $\mathbf{R}$, and your flexion data have the same number of time windows. (Note: instead of using the matrix inverse of $\mathbf{R}^T\mathbf{R}$, use Matlab mldivide function, which is generally more stable.) (4 points)
+    
+    \item Try one other machine learning classifier using your features and finger angle labels. Look back through previous homeworks to get some ideas. (4 points)
+    
+    \item Produce predictions on your test set for each finger angle. Calculate the correlation coefficient $\rho$ between predicted and test finger angles for each finger separately. (Hint: see Matlab’s corr function). Report your correlations here for each finger when using the linear filter, and when using the other classifier(s) that you tried (2 pts). \\
+    Answer Here
+\end{enumerate}
+
+\end{document}
+    
