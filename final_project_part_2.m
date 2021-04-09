@@ -24,7 +24,7 @@ addpath(genpath(fullfile(base_path, 'Project')))
 username = 'spatank';
 passPath = 'spa_ieeglogin.bin';
 
-subj = 2; % change this depending on which subject is being processed
+subj = 1; % change this depending on which subject is being processed
 
 % % Load training ecog from each of three patients
 % train_ecog = IEEGSession(sprintf('I521_Sub%d_Training_ecog', subj), ...
@@ -49,7 +49,7 @@ dataglove = all_data.train_dg{subj};
 % % Split data into a train and test set (use at least 50% for training)
 
 [m, n] = size(ecog);
-P = 0.8; % percentage of training data
+P = 0.7; % percentage of training data
 train_ecog = ecog(1:round(P * m), :);
 train_dg = dataglove(1:round(P * m), :);
 val_ecog = ecog(round(P * m) + 1:end, :);
@@ -100,7 +100,7 @@ for channel = 1:num_dg_channels
     Y_hat_train_full(:, channel) = interp1(1:length(Y_hat_train(:, channel)), ...
         Y_hat_train(:, channel), ...
         linspace(1, length(Y_hat_train(:, channel)), size(train_dg, 1)), ...
-        'pchip'); 
+        'spline'); 
 end
 train_corrs = diag(corr(Y_hat_train_full, train_dg))
 
@@ -144,7 +144,7 @@ for channel = 1:num_dg_channels
     Y_hat_val_full(:, channel) = interp1(1:length(Y_hat_val(:, channel)), ...
         Y_hat_val(:, channel), ...
         linspace(1, length(Y_hat_val(:, channel)), size(val_dg, 1)), ...
-        'pchip'); 
+        'spline'); 
 end
 val_corrs = diag(corr(Y_hat_val_full, val_dg))
 
@@ -162,3 +162,26 @@ val_corrs = diag(corr(Y_hat_val_full, val_dg))
 %     alt_models(channel).val_preds = Y_hat_val_full; % store downsampled predictions
 %     alt_models(channel).val_corr = corr(Y_hat_val_full', val_dg(:, channel));
 % end
+
+%% Test
+
+close all;
+
+figure;
+hold on
+plot(1:150000, train_dg(1:150000), 'r')
+plot(1:150000, Y_hat_train_full(1:150000), 'b')
+hold off
+legend('True', 'Prediction');
+
+figure;
+hold on
+plot(1:60000, val_dg(1:60000), 'r')
+plot(1:60000, Y_hat_val_full(1:60000), 'b')
+hold off
+legend('True', 'Prediction');
+
+% test = Y_hat_val_full;
+% test(test < 1.5) =  -0.7;
+% test(test < -1.5) =  -0.7;
+% val_corrs = diag(corr(test, val_dg))
