@@ -42,6 +42,7 @@ all_data = load('final_proj_part1_data.mat');
 
 ecog = all_data.train_ecog{subj};
 dataglove = all_data.train_dg{subj};
+dataglove = smoothdata(dataglove, 'movmean', 200);
 % (1.1) There are 300000 samples in the raw recording.
 % (1.2) The filter is a bandpass filter allowing signal in the range from
 % 0.15 Hz to 200 Hz.
@@ -49,7 +50,7 @@ dataglove = all_data.train_dg{subj};
 % % Split data into a train and test set (use at least 50% for training)
 
 [m, n] = size(ecog);
-P = 0.7; % percentage of training data
+P = 0.8; % percentage of training data
 train_ecog = ecog(1:round(P * m), :);
 train_dg = dataglove(1:round(P * m), :);
 val_ecog = ecog(round(P * m) + 1:end, :);
@@ -79,19 +80,20 @@ R = getWindowedFeats(train_ecog, fs, window_length, window_overlap);
 % calculate the linear filter (i.e. the weights matrix) as defined by 
 % Equation 1 for all 5 finger angles.
 
-% Downsampling using means over windows for the dataglove signal
 num_dg_channels = size(train_dg, 2);
+
+% Downsampling using medians over windows for the dataglove signal
 Y_train = zeros(num_train_wins, num_dg_channels);
 win_start_idx = 1;
 for i = 1:num_train_wins
     win_end_idx = win_start_idx + (window_length * fs) - 1;
     curr_window = train_dg(win_start_idx:win_end_idx, :);
-    Y_train(i, :) = mean(curr_window);
+    Y_train(i, :) = median(curr_window);
     win_start_idx = win_start_idx + (window_overlap * fs);
 end
 
 % Warland et al. (1997)
-f = mldivide(R' * R, R' * Y_train);
+f = pinv(R' * R) * (R' * Y_train);
 
 Y_hat_train = R * f; 
 % Upsample the predictions 
@@ -132,10 +134,10 @@ win_start_idx = 1;
 for i = 1:num_val_wins
     win_end_idx = win_start_idx + (window_length * fs) - 1;
     curr_window = val_dg(win_start_idx:win_end_idx, :);
-    Y_val(i, :) = mean(curr_window);
+    Y_val(i, :) = median(curr_window);
     win_start_idx = win_start_idx + (window_overlap * fs);
 end
-    
+
 Y_hat_val = R_val * f;
 % Upsample the predictions 
 Y_hat_val_full = zeros(size(val_dg));
@@ -181,7 +183,6 @@ hold off
 legend('True', 'Prediction');
 
 figure;
-% test_1 = lowpass(Y_hat_train_full(:, 1), 150, fs);
 test_1 = smoothdata(Y_hat_train_full, 'movmean', 250);
 train_corrs = diag(corr(test_1, train_dg))
 hold on
@@ -191,8 +192,8 @@ hold off
 legend('True', 'Prediction');
 
 figure;
-% test_2 = lowpass(Y_hat_val_full(:, 1), 150, fs);
-test_2 = smoothdata(Y_hat_val_full, 'movmean', 250);
+test_2 = Y_hat_val_full;
+test_2 = smoothdata(test_2, 'movmean', 250);
 val_corrs = diag(corr(test_2, val_dg))
 hold on
 plot(1:60000, val_dg(1:60000, 1), 'r')
@@ -210,3 +211,4 @@ end
 
 figure;
 plot(ks, corrs_store)
+

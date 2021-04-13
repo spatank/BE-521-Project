@@ -49,7 +49,7 @@ for i = 1:num_wins
 end
     
 % Finally, return feature matrix
-N_wind = 4;
+N_wind = 5;
 all_feats = create_R_matrix(features, N_wind);
 
 end

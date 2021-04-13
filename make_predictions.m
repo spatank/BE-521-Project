@@ -43,13 +43,13 @@ for i = 1:num_subjects
             'pchip'); 
     end
     if i == 1
-        predicted_dg{i} = smoothdata(Y_hat_test_full, 'movmean', 270);
+        predicted_dg{i} = smoothdata(Y_hat_test_full, 'movmean', 335);
     end
-    if i == 2
-        predicted_dg{i} = smoothdata(Y_hat_test_full, 'movmean', 375);
+    if i == 2 
+        predicted_dg{i} = smoothdata(Y_hat_test_full, 'movmean', 425);
     end
-    if i == 3
-        predicted_dg{i} = smoothdata(Y_hat_test_full, 'movmean', 415);
+    if i == 3 
+        predicted_dg{i} = smoothdata(Y_hat_test_full, 'movmean', 465);
     end
 end
 
