@@ -21,9 +21,9 @@ function [features] = get_features(clean_data, fs)
 
 num_channels = size(clean_data, 2);
 
-num_features = 6;
+num_features = 7;
 
-% LLFn = @(x) sum(abs(diff(x)));
+LLFn = @(x) sum(abs(diff(x)));
 % areaFn = @(x) sum(abs(x));
 % energyFn = @(x) sum(x.^2);
 
@@ -37,7 +37,7 @@ for channel = 1:num_channels
     features(channel, 4) = bandpower(signal, fs, [125, 160]);
     features(channel, 5) = bandpower(signal, fs, [160, 175]);
     features(channel, 6) = mean(signal);
-%     features(channel, 7) = LLFn(signal);
+    features(channel, 7) = LLFn(signal);
 %     features(channel, 8) = areaFn(signal);
 %     features(channel, 9) = energyFn(signal);
 end

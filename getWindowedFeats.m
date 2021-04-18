@@ -35,7 +35,7 @@ num_wins = ...
     NumWins(length(filtered_data(:, 1)), fs, window_length, window_overlap);
 % Then, loop through sliding windows
 num_channels = size(filtered_data, 2);
-num_features = 6;
+num_features = 7;
 features = zeros(num_wins, (num_channels * num_features));
 win_start_idx = 1;
 for i = 1:num_wins
@@ -49,7 +49,7 @@ for i = 1:num_wins
 end
     
 % Finally, return feature matrix
-N_wind = 5;
+N_wind = 4;
 all_feats = create_R_matrix(features, N_wind);
 
 end
