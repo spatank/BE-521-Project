@@ -14,15 +14,15 @@
 
 %% Start the necessary ieeg.org sessions 
 
-clc; close all; clear;
-
-cd('/Users/sppatankar/Developer/BE-521/')
-base_path = '/Users/sppatankar/Developer/BE-521/';
-addpath(genpath(fullfile(base_path, 'ieeg-matlab-1.14.49')))
-addpath(genpath(fullfile(base_path, 'Project')))
-
-username = 'spatank';
-passPath = 'spa_ieeglogin.bin';
+% clc; close all; clear;
+% 
+% cd('/Users/sppatankar/Developer/BE-521/')
+% base_path = '/Users/sppatankar/Developer/BE-521/';
+% addpath(genpath(fullfile(base_path, 'ieeg-matlab-1.14.49')))
+% addpath(genpath(fullfile(base_path, 'Project')))
+% 
+% username = 'spatank';
+% passPath = 'spa_ieeglogin.bin';
 
 subj = 3; % change this depending on which subject is being processed
 
@@ -36,6 +36,7 @@ subj = 3; % change this depending on which subject is being processed
 clc; % remove the session loading warnings from IEEG
 all_data = load('final_proj_part1_data.mat');
 
+%test
 %% Extract dataglove and ECoG data 
 % Dataglove should be (samples x 5) array 
 % ECoG should be (samples x channels) array
@@ -53,7 +54,7 @@ dataglove = smoothdata(dataglove, 'movmean', 200);
 P = 0.6; % percentage of training data
 train_ecog=[];
 train_dg=[];
-idx=1:m/100:m;
+idx=1:m/100:m; %need to generalize to work for any m....
 for i=1:length(idx)
     if idx(i)<=m-round(P*m)
         train_ecog(:,:,i) = ecog(idx(i):idx(i)+round(P * m), :);
