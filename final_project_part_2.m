@@ -14,15 +14,15 @@
 
 %% Start the necessary ieeg.org sessions 
 
-clc; close all; clear;
-
-cd('/Users/sppatankar/Developer/BE-521/')
-base_path = '/Users/sppatankar/Developer/BE-521/';
-addpath(genpath(fullfile(base_path, 'ieeg-matlab-1.14.49')))
-addpath(genpath(fullfile(base_path, 'Project')))
-
-username = 'spatank';
-passPath = 'spa_ieeglogin.bin';
+% clc; close all; clear;
+% 
+% cd('/Users/sppatankar/Developer/BE-521/')
+% base_path = '/Users/sppatankar/Developer/BE-521/';
+% addpath(genpath(fullfile(base_path, 'ieeg-matlab-1.14.49')))
+% addpath(genpath(fullfile(base_path, 'Project')))
+% 
+% username = 'spatank';
+% passPath = 'spa_ieeglogin.bin';
 
 subj = 3; % change this depending on which subject is being processed
 
@@ -50,11 +50,18 @@ dataglove = smoothdata(dataglove, 'movmean', 200);
 % % Split data into a train and test set (use at least 50% for training)
 
 [m, n] = size(ecog);
-P = 1; % percentage of training data
-train_ecog = ecog(1:round(P * m), :);
-train_dg = dataglove(1:round(P * m), :);
-% val_ecog = ecog(round(P * m) + 1:end, :);
-% val_dg = dataglove(round(P * m) + 1:end, :);
+P = 0.6; % percentage of training data
+train_ecog=[];
+train_dg=[];
+idx=1:m/100:m;
+for i=1:length(idx)
+    if idx(i)<=m-round(P*m)
+        train_ecog(:,:,i) = ecog(idx(i):idx(i)+round(P * m), :);
+        train_dg(:,:,i) = dataglove(idx(i):idx(i)+round(P * m), :);
+    end
+end
+val_ecog = ecog(round(P * m) + 1:end, :);
+val_dg = dataglove(round(P * m) + 1:end, :);
 
 %% Get Features
 % run getWindowedFeats function
