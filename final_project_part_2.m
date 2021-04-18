@@ -14,15 +14,15 @@
 
 %% Start the necessary ieeg.org sessions 
 
-clc; close all; clear;
-
-cd('/Users/sppatankar/Developer/BE-521/')
-base_path = '/Users/sppatankar/Developer/BE-521/';
-addpath(genpath(fullfile(base_path, 'ieeg-matlab-1.14.49')))
-addpath(genpath(fullfile(base_path, 'Project')))
-
-username = 'spatank';
-passPath = 'spa_ieeglogin.bin';
+% clc; close all; clear;
+% 
+% cd('/Users/sppatankar/Developer/BE-521/')
+% base_path = '/Users/sppatankar/Developer/BE-521/';
+% addpath(genpath(fullfile(base_path, 'ieeg-matlab-1.14.49')))
+% addpath(genpath(fullfile(base_path, 'Project')))
+% 
+% username = 'spatank';
+% passPath = 'spa_ieeglogin.bin';
 
 subj = 3; % change this depending on which subject is being processed
 
@@ -36,6 +36,7 @@ subj = 3; % change this depending on which subject is being processed
 clc; % remove the session loading warnings from IEEG
 all_data = load('final_proj_part1_data.mat');
 
+%test
 %% Extract dataglove and ECoG data 
 % Dataglove should be (samples x 5) array 
 % ECoG should be (samples x channels) array
