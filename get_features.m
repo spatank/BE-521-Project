@@ -27,22 +27,23 @@ num_features = 6;
 % areaFn = @(x) sum(abs(x));
 % energyFn = @(x) sum(x.^2);
 
-features = zeros(num_channels, num_features);
-
-for channel = 1:num_channels
-    signal = clean_data(:, channel);
-    features(channel, 1) = bandpower(signal, fs, [5, 15]);
-    features(channel, 2) = bandpower(signal, fs, [20, 25]);
-    features(channel, 3) = bandpower(signal, fs, [75, 115]);
-    features(channel, 4) = bandpower(signal, fs, [125, 160]);
-    features(channel, 5) = bandpower(signal, fs, [160, 175]);
-    features(channel, 6) = mean(signal);
-%     features(channel, 7) = LLFn(signal);
-%     features(channel, 8) = areaFn(signal);
-%     features(channel, 9) = energyFn(signal);
+features=zeros(size(clean_data,3),num_channels*num_features);
+for iter=1:size(clean_data,3)
+    feat = zeros(num_channels, num_features);
+    for channel = 1:num_channels
+        signal = clean_data(:, channel,iter);
+        feat(channel, 1) = bandpower(signal, fs, [5, 15]);
+        feat(channel, 2) = bandpower(signal, fs, [20, 25]);
+        feat(channel, 3) = bandpower(signal, fs, [75, 115]);
+        feat(channel, 4) = bandpower(signal, fs, [125, 160]);
+        feat(channel, 5) = bandpower(signal, fs, [160, 175]);
+        feat(channel, 6) = mean(signal);
+        %     features(channel, 7) = LLFn(signal);
+        %     features(channel, 8) = areaFn(signal);
+        %     features(channel, 9) = energyFn(signal);
+    end
+    
+    features(iter,:)=feat(:);
 end
-
-features = features(:);
-
 end
 

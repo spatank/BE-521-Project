@@ -23,7 +23,7 @@ Wp = [0.15, 200]/(fs/2); % normalized bandpass frequencies
 
 filtered_eeg = zeros(size(raw_eeg)); % applied column wise
 for i = 1:size(raw_eeg, 2)
-    filtered_eeg(:, i) = filtfilt(b, a, raw_eeg(:, i));
+    filtered_eeg(:, i,:) = filtfilt(b, a, raw_eeg(:, i,:));
 end
 
 % Plotting code for filter testing in debugger
