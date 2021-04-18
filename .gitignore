@@ -12,6 +12,7 @@ Data
 */Submit
 */submit
 */submission
+*.mat
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
