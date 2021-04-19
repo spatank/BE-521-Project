@@ -15,7 +15,7 @@ num_raw_features = size(features, 2);
 num_features = N_wind * num_raw_features;
 R = NaN(samples, num_features,size(features,3));
 
-features_augmented = cat(1,features(1:N_wind-1, :), features);
+features_augmented = cat(1,features(1:N_wind-1, :,:), features);
 for iter=1:size(features,3)
     for i = 1:samples
         prev_idx_vec = i:i+N_wind-1;
@@ -27,6 +27,6 @@ for iter=1:size(features,3)
         R(i, :, iter) = prev_window_feats(:);
     end
 end
-R = cat(1,ones(size(R, 1), 1,size(R,3)), R);
+R = cat(2,ones(size(R, 1), 1,size(R,3)), R);
 
 end
