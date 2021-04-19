@@ -14,15 +14,15 @@
 
 %% Start the necessary ieeg.org sessions 
 
-clc; close all; clear;
-
-cd('/Users/sppatankar/Developer/BE-521/')
-base_path = '/Users/sppatankar/Developer/BE-521/';
-addpath(genpath(fullfile(base_path, 'ieeg-matlab-1.14.49')))
-addpath(genpath(fullfile(base_path, 'Project')))
-
-username = 'spatank';
-passPath = 'spa_ieeglogin.bin';
+% clc; close all; clear;
+% 
+% cd('/Users/sppatankar/Developer/BE-521/')
+% base_path = '/Users/sppatankar/Developer/BE-521/';
+% addpath(genpath(fullfile(base_path, 'ieeg-matlab-1.14.49')))
+% addpath(genpath(fullfile(base_path, 'Project')))
+% 
+% username = 'spatank';
+% passPath = 'spa_ieeglogin.bin';
 
 subj = 3; % change this depending on which subject is being processed
 
@@ -90,19 +90,23 @@ R = getWindowedFeats(train_ecog, fs, window_length, window_overlap);
 num_dg_channels = size(train_dg, 2);
 
 % Downsampling using medians over windows for the dataglove signal
-Y_train = zeros(num_train_wins, num_dg_channels);
+Y_train = zeros(num_train_wins, num_dg_channels,size(train_dg,3));
 win_start_idx = 1;
 for i = 1:num_train_wins
     win_end_idx = win_start_idx + (window_length * fs) - 1;
-    curr_window = train_dg(win_start_idx:win_end_idx, :);
-    Y_train(i, :) = median(curr_window);
+    curr_window = train_dg(win_start_idx:win_end_idx, :,:);
+    Y_train(i, :,:) = median(curr_window);
     win_start_idx = win_start_idx + (window_overlap * fs);
 end
 
 % Warland et al. (1997)
-f = pinv(R' * R) * (R' * Y_train);
+f=[];
+for i=1:size(R,3)
+    f(:,:,i) = pinv(R(:,:,i)' * R(:,:,i)) * (R(:,:,i)' * Y_train(:,:,i));
+end
 
-Y_hat_train = R * f; 
+
+Y_hat_train = R * mean(f,3); 
 % Upsample the predictions 
 Y_hat_train_full = zeros(size(train_dg));
 for channel = 1:num_dg_channels
