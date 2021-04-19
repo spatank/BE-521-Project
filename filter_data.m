@@ -26,7 +26,7 @@ for i = 1:size(raw_eeg, 2)
     filtered_eeg(:, i) = filtfilt(b, a, raw_eeg(:, i));
 end
 
-% Plotting code for filter testing in debugger
+% % Plotting code for filter testing in debugger
 % Y = fft(raw_eeg(:, 1));
 % L = size(raw_eeg, 1);
 % P2 = abs(Y/L);
@@ -39,7 +39,7 @@ end
 % title('Single-Sided Amplitude Spectrum of X(t)')
 % xlabel('f (Hz)')
 % ylabel('|P1(f)|')
-
+% 
 % Y = fft(filtered_eeg(:, 1));
 % L = size(filtered_eeg, 1);
 % P2 = abs(Y/L);

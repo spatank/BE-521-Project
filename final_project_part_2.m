@@ -1,4 +1,4 @@
-%% Final project part 1
+%% Final project part 2
 % Prepared by John Bernabei and Brittany Scheid
 
 % One of the oldest paradigms of BCI research is motor planning: predicting
@@ -24,7 +24,7 @@ addpath(genpath(fullfile(base_path, 'Project')))
 username = 'spatank';
 passPath = 'spa_ieeglogin.bin';
 
-subj = 3; % change this depending on which subject is being processed
+subj = 2; % change this depending on which subject is being processed
 
 % % Load training ecog from each of three patients
 % train_ecog = IEEGSession(sprintf('I521_Sub%d_Training_ecog', subj), ...
