@@ -28,7 +28,7 @@ num_features = 6;
 % energyFn = @(x) sum(x.^2);
 
 features=zeros(size(clean_data,3),num_channels*num_features);
-for iter=1:size(clean_data,3)
+parfor iter=1:size(clean_data,3)
     feat = zeros(num_channels, num_features);
     for channel = 1:num_channels
         signal = clean_data(:, channel,iter);
