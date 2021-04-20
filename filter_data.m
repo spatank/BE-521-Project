@@ -21,10 +21,9 @@ Rs = 120; % attenuation in the stopband
 Wp = [0.15, 200]/(fs/2); % normalized bandpass frequencies
 [b, a] = ellip(n, Rp, Rs, Wp, 'bandpass');
 
-filtered_eeg = zeros(size(raw_eeg)); % applied column wise
-for i = 1:size(raw_eeg, 2)
-    filtered_eeg(:, i) = filtfilt(b, a, raw_eeg(:, i));
-end
+
+filtered_eeg = filtfilt(b, a, raw_eeg);
+
 
 % % Plotting code for filter testing in debugger
 % Y = fft(raw_eeg(:, 1));
