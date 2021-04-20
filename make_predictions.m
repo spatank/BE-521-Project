@@ -31,25 +31,24 @@ for i = 1:num_subjects
     end
     % create R matrix
     R = getWindowedFeats(subj_test_ecog, fs, window_length, window_overlap);
-    load(sprintf('/Users/sppatankar/Developer/BE-521/Project/f_subj_%d.mat', i), 'f')
-    Y_hat_test = R * f; 
-    num_dg_channels = size(Y_hat_test, 2); 
-    % Upsample the predictions in each window
+    load(sprintf('/Users/sppatankar/Developer/BE-521/Project/alt_models_subj_%d.mat', i), 'alt_models')
+    num_dg_channels = 5;
     Y_hat_test_full = zeros(size(subj_test_ecog, 1), num_dg_channels);
     for channel = 1:num_dg_channels
-        Y_hat_test_full(:, channel) = interp1(1:length(Y_hat_test(:, channel)), ...
-            Y_hat_test(:, channel), ...
-            linspace(1, length(Y_hat_test(:, channel)), size(subj_test_ecog, 1)), ...
-            'pchip'); 
+        model = alt_models(channel).channel_model; % get trained model
+        Y_hat_test_channel = R * model.coef + model.coef0;
+        Y_hat_test_full(:, channel) = interp1(1:length(Y_hat_test_channel), Y_hat_test_channel, ...
+            linspace(1, length(Y_hat_test_channel), size(subj_test_ecog, 1)), ...
+            'pchip'); % upsample the predictions
     end
     if i == 1
-        predicted_dg{i} = smoothdata(Y_hat_test_full, 'movmean', 335);
+        predicted_dg{i} = smoothdata(Y_hat_test_full, 'movmean', 2700);
     end
     if i == 2 
-        predicted_dg{i} = smoothdata(Y_hat_test_full, 'movmean', 425);
+        predicted_dg{i} = smoothdata(Y_hat_test_full, 'movmean', 2100);
     end
     if i == 3 
-        predicted_dg{i} = smoothdata(Y_hat_test_full, 'movmean', 465);
+        predicted_dg{i} = smoothdata(Y_hat_test_full, 'movmean', 1830);
     end
 end
 
