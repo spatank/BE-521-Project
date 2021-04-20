@@ -24,7 +24,7 @@ addpath(genpath(fullfile(base_path, 'Project')))
 username = 'spatank';
 passPath = 'spa_ieeglogin.bin';
 
-subj = 1; % change this depending on which subject is being processed
+subj = 3; % change this depending on which subject is being processed
 
 % % Load training ecog from each of three patients
 % train_ecog = IEEGSession(sprintf('I521_Sub%d_Training_ecog', subj), ...
@@ -96,9 +96,9 @@ for i = 1:num_dg_channels
 end
 
 % % Warland et al. (1997)
-% f = pinv(R' * R) * (R' * Y_train);
+% f = pinv(R_train' * R_train) * (R_train' * Y_train);
 % 
-% Y_hat_train = R * f; 
+% Y_hat_train = R_train * f; 
 % % Upsample the predictions 
 % Y_hat_train_full = zeros(size(train_dg));
 % for channel = 1:num_dg_channels

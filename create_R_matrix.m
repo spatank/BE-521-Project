@@ -28,6 +28,7 @@ for i = 1:samples
 end
 
 % add noise to ensure invertibility
-R = [ones(size(R, 1), 1) + 0.001 * rand, R]; 
+% R = [ones(size(R, 1), 1) + 0.001 * rand, R]; 
+R = [ones(size(R, 1), 1), R];
 
 end
