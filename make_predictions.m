@@ -31,7 +31,7 @@ for i = 1:num_subjects
     end
     % create R matrix
     R = getWindowedFeats(subj_test_ecog, fs, window_length, window_overlap);
-    load(sprintf('/Users/sppatankar/Developer/BE-521/Project/alt_models_subj_%d.mat', i), 'alt_models')
+    load(sprintf('/Users/sppatankar/Developer/BE-521/alt_models_subj_%d.mat', i), 'alt_models')
     num_dg_channels = 5;
     Y_hat_test_full = zeros(size(subj_test_ecog, 1), num_dg_channels);
     for channel = 1:num_dg_channels
@@ -43,9 +43,11 @@ for i = 1:num_subjects
     end
     if i == 1
         predicted_dg{i} = smoothdata(Y_hat_test_full, 'movmean', 2700);
+        % predicted_dg{i} = medfilt1(Y_hat_test_full, 300);
     end
     if i == 2 
         predicted_dg{i} = smoothdata(Y_hat_test_full, 'movmean', 2100);
+        % predicted_dg{i} = medfilt1(Y_hat_test_full, 340);
     end
     if i == 3 
         predicted_dg{i} = smoothdata(Y_hat_test_full, 'movmean', 1830);

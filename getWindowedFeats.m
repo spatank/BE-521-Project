@@ -46,10 +46,11 @@ for i = 1:num_wins
     % output of get_features should be (1 x (channels * features))
     features(i, :) = get_features(curr_window, fs);
     win_start_idx = win_start_idx + (window_overlap * fs);
+    
 end
     
 % Finally, return feature matrix
-N_wind = 5; % submission has 4
+N_wind = 4; % submission has 4
 all_feats = create_R_matrix(features, N_wind);
 
 end
